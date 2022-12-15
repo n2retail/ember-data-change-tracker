@@ -1,16 +1,28 @@
 import Ember from 'ember';
 import Model from 'ember-data/model';
 import Tracker from './tracker';
+import { deprecate } from '@ember/debug';
 
 Model.reopen({
 
   init(){
     this._super(...arguments);
     if (Tracker.isAutoSaveEnabled(this)) {
+      deprecate('Do not enable ember-data-change-tracker auto save', false, {
+        id: 'ember-data-change-tracker.no-auto-save',
+        until: '3.28.0',
+        for: 'ember-data-change-tracker'
+      });
+
       this.initTracking();
     }
     if (Tracker.isIsDirtyEnabled(this)) {
       // this is experimental
+      deprecate('Do not enable change tracker dirtyness tracking', false, {
+        id: 'ember-data-change-tracker.no-is-dirty-enabled',
+        until: '3.28.0',
+        for: 'ember-data-change-tracker'
+      });
       Tracker.initializeDirtiness(this);
     }
 
@@ -63,6 +75,12 @@ Model.reopen({
    *
    */
   rollback() {
+    deprecate('Do not call rollback from ember-data-change-tracker', false, {
+      id: 'ember-data-change-tracker.no-rollback',
+      until: '3.28.0',
+      for: 'ember-data-change-tracker'
+    });
+
     const isNew = this.get('isNew');
     this.rollbackAttributes();
     if (isNew) { return; }
@@ -74,6 +92,12 @@ Model.reopen({
 
   // alias for saveChanges method
   startTrack() {
+    deprecate('Do not initialize ember-data-change-tracker', false, {
+      id: 'ember-data-change-tracker.no-rollback',
+      until: '3.28.0',
+      for: 'ember-data-change-tracker'
+    });
+
     this.initTracking();
     this.saveChanges();
   },
@@ -134,6 +158,12 @@ Model.reopen({
    * @returns {*}
    */
   savedTrackerValue(key) {
+    deprecate('Do not call savedTrackerValue ember-data-change-tracker', false, {
+      id: 'ember-data-change-tracker.no-savedTrackerValue',
+      until: '3.28.0',
+      for: 'ember-data-change-tracker'
+    });
+
     return Tracker.lastValue(this, key);
   },
 
@@ -174,6 +204,12 @@ Model.reopen({
     let promise = this._super(...arguments);
     promise.then(() => {
       if (Tracker.isAutoSaveEnabled(this)) {
+        deprecate('Do not reload ember-data-change-tracker model', false, {
+          id: 'ember-data-change-tracker.no-reload',
+          until: '3.28.0',
+          for: 'ember-data-change-tracker'
+        });
+
         this.saveChanges();
       }
     });
@@ -187,6 +223,12 @@ Model.reopen({
 
   observeUnknownRelationshipLoaded(sender, key/*, value, rev*/) {
     if (Tracker.trackingIsSetup(this) && Tracker.isTracking(this, key)) {
+      deprecate('Do not track relationship changes', false, {
+        id: 'ember-data-change-tracker.no-relation-tracking',
+        until: '3.28.0',
+        for: 'ember-data-change-tracker'
+      });
+
       let saved = Tracker.saveLoadedRelationship(this, key);
       if (saved) {
         this.removeObserver(key, this, 'observeUnknownRelationshipLoaded');
